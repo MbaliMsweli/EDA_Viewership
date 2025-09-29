@@ -1,0 +1,116 @@
+# Databricks notebook source
+# MAGIC %md
+# MAGIC # Meta Data
+
+# COMMAND ----------
+
+# Metadata is data that provides information about other data and It describes the structure, meaning, and context of the data, such as column names, data types, descriptions, and source information.
+metadata = {
+    "name": "Viewership Analysis",
+    "description": "This data shows what people watched. It tells us who watched, what they watched, and how long they watched.",
+    "columns": {
+        "CustomerID": "A number for each person.",
+        "VideoTitle": "The name of the video.",
+        "Platform": "Where the video was watched (like phone or computer).",
+        "PlayEventType": "What happened (like play or pause).",
+        "TotalTimeWatched": "How long the video was watched."
+    }
+}
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC # Impoty Library
+
+# COMMAND ----------
+
+# Is a python libray for data manipulation 
+import pandas as pd
+
+#is a python library for numerical operations
+import numpy as np
+
+# COMMAND ----------
+
+# MAGIC %md
+# MAGIC ### Data Ingestion
+
+# COMMAND ----------
+
+#creating path of the excel file
+data_path="/Workspace/Users/mbali.sandav@gmail.com/Viewership Analysis .xlsx" 
+
+# COMMAND ----------
+
+# Installing dependency called openpyxl
+!pip install openpyxl
+
+# COMMAND ----------
+
+# storing the excel file in variable and read the file
+viwership_analysis=pd.read_excel(data_path)
+
+
+# COMMAND ----------
+
+#displaying the dataset
+display(viwership_analysis)
+
+# COMMAND ----------
+
+#Shows the number of rows and columns
+viwership_analysis.shape
+
+# COMMAND ----------
+
+# Gives the column names in the dataset
+viwership_analysis.columns
+
+# COMMAND ----------
+
+# It gives the summary information about the dataset
+viwership_analysis.info()
+
+# COMMAND ----------
+
+#To check the type of data in the dataset
+viwership_analysis.dtypes
+
+# COMMAND ----------
+
+# To check duplicated values by rows
+viwership_analysis.duplicated()
+
+# COMMAND ----------
+
+# To check empty values in each row
+viwership_analysis.isnull()
+
+# COMMAND ----------
+
+# Checks the unique values in the column Platform
+viwership_analysis['Platform'].unique()
+
+# COMMAND ----------
+
+# Checks the unique values in the column PlayEventType
+viwership_analysis['PlayEventType'].unique()
+
+# COMMAND ----------
+
+
+# This shows how many times each platform is used in the data
+viwership_analysis['Platform'].value_counts()
+
+# COMMAND ----------
+
+# Calculates how many unique customers viewed each VideoTitle in descending order
+viwership_analysis.groupby('VideoTitle')['CustomerID'].nunique().sort_values(ascending=False)
+
+
+
+# COMMAND ----------
+
+
+# Calculate the VideoTitle with the highest total watch duration
+viwership_analysis.groupby('VideoTitle')['TotalTimeWatched'].sum().sort_values(ascending=False)
