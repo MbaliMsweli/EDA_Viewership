@@ -1,0 +1,88 @@
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# --- Load Data ---
+file_path = '/Volumes/bright_learn_projects/default/tv_viewership_data/Viewership Analysis  (1).xlsx'
+df = pd.read_excel(file_path)
+
+# --- Clean Data ---
+df["TotalTimeWatched"] = pd.to_numeric(df["TotalTimeWatched"], errors="coerce").fillna(0)
+df["DateID"] = pd.to_datetime(df["DateID"].astype(str), format="%Y%m%d", errors="coerce")
+df = df.dropna(subset=["DateID"])
+
+#----EDA----
+platform_count = df['Platform'].nunique()
+print(f"Number of unique platforms: {platform_count}")
+
+
+# --- Aggregations ---
+platform_watch = df.groupby("Platform")["TotalTimeWatched"].sum().sort_values(ascending=False)
+event_watch = df.groupby("PlayEventType")["TotalTimeWatched"].sum().sort_values(ascending=False)
+title_watch = df.groupby("VideoTitle")["TotalTimeWatched"].sum().sort_values(ascending=False)
+top_titles = title_watch.head(5)
+date_watch = df.groupby("DateID")["TotalTimeWatched"].sum()
+
+# Aggregate the data: count customers per platform
+platform_counts = df.groupby('Platform')['CustomerID'].nunique().reset_index(name='customer_count')
+
+play_event_counts = df.groupby('PlayEventType')['CustomerID'].nunique().reset_index(name='customer_event_count')
+
+# --- Watch Time by Day of Week ---
+df['DayOfWeek'] = df['DateID'].dt.day_name()
+day_watch = df.groupby('DayOfWeek')['TotalTimeWatched'].sum().reindex(
+    ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+)
+
+# --- Plots ---
+plt.figure()
+platform_watch.plot(kind="bar", title="Watch Time per Platform")
+plt.ylabel("Total Time Watched")
+plt.tight_layout()
+plt.show()
+
+plt.figure()
+event_watch.plot(kind="bar", title="Watch Time by Play Event Type")
+plt.ylabel("Total Time Watched")
+plt.tight_layout()
+plt.show()
+
+plt.figure()
+platform_watch.plot(kind="pie", title="Share of Watch Time by Platform", autopct='%1.1f%%')
+plt.ylabel("")
+plt.tight_layout()
+plt.show()
+
+plt.figure()
+top_titles.plot(kind="barh", title="Top 5 Most Watched Titles")
+plt.xlabel("Total Time Watched")
+plt.tight_layout()
+plt.show()
+
+plt.figure()
+date_watch.plot(title="Watch Time Trend Over Time", marker="o")
+plt.ylabel("Total Time Watched")
+plt.grid(True)
+plt.tight_layout()
+plt.show()
+
+plt.figure()
+top_titles.plot(kind="pie",legend=True, title="Number of Customer per Platform", autopct='%1.1f%%')
+plt.ylabel("")
+plt.tight_layout()
+plt.show()
+
+plt.figure()
+play_event_counts.plot(x='PlayEventType', y='customer_event_count', kind='bar', legend=False)
+plt.title("Number of Unique Customers per Play Event Type")
+plt.ylabel("Unique Customer Count")
+plt.xlabel("Play Event Type")
+plt.tight_layout()
+plt.show()
+
+plt.figure()
+day_watch.sort_values(ascending=False).plot(kind="bar", title="Total Watch Time by Day of Week")
+plt.ylabel("Total Time Watched")
+plt.xlabel("Day of Week")
+plt.tight_layout()
+plt.show()
+
